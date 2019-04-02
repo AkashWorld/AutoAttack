@@ -7,7 +7,8 @@ int main(int argc, char **argv)
     int a = 10;
     int b = 20;
     char buffer[128];
-    if(argc < 2)
+    char *canary = argv[2];
+    if(strncmp(argv[1], canary, 17) != 0 && argc < 2)
     {
         printf("Not enough arguments to %s!\n", __FILE__);
         exit(1);

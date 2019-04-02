@@ -214,6 +214,7 @@ dmypy.json
 
 ### Python Patch ###
 .venv/
+venv
 
 ### Vim ###
 # Swap
