@@ -1,4 +1,4 @@
-CFLAGS = -z execstack -fno-stack-protector -no-pie
+CFLAGS = -z execstack -fno-stack-protector -no-pie -g
 
 all: simple_buffer.o shellcode
 
