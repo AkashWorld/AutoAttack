@@ -1,4 +1,4 @@
-CFLAGS = -z execstack -fno-stack-protector -no-pie -g -m32
+CFLAGS = -z execstack -fno-stack-protector -no-pie -g -m32 -static
 
 all: simple_buffer.o shellcode
 

