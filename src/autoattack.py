@@ -6,7 +6,7 @@ import sys
 import angr
 import claripy
 import struct
-
+import ropgadget
 
 def load_shellcode(file_path):
     '''
@@ -200,5 +200,11 @@ def test_payload(payload, file_path):
 
 
 if __name__ == "__main__":
-    payload = generate_exploit()
-    test_payload(payload, "../tests/resources/simple_buffer.o")
+	print("Menu:\n1. Buffer Overflow Generation\n2. ROP Shellcode Generation")
+	x = input()
+	if x == 1:
+		payload = generate_exploit()
+    	test_payload(payload, "../tests/resources/simple_buffer.o")
+	elif x == 2:
+		print(ropgadget.main("../tests/resources/simple_buffer.o"))
+    
