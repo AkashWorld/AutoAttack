@@ -1,3 +1,7 @@
+###
+NOTE. This project comes in two parts. The buffer generation, and the ROP generation. The buffer generation code is in the master branch and works on 64 bit machines. The ROP generation is in the second (AngrExperiments) branch. Please check both for grading.
+###
+
 # AutoAttack - GDBad
 
 This software generates control flow exploits for binaries with buffers that facilitate memory corruption.
