@@ -6,6 +6,8 @@ NOTE. This project comes in two parts. The buffer generation, and the ROP genera
 
 This software generates control flow exploits for binaries with buffers that facilitate memory corruption.
 
+Source codes in the src and tests/resources folder contribute to this project and are written by us.
+
 ## Getting Started
 
 
